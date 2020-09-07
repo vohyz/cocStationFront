@@ -8,10 +8,9 @@ import messageBox from "./utils/messageBox";
 import globalData from "./config/common";
 import VueAnime from './utils/anime';
 import VueSocketIO from 'vue-socket.io'
-
 Vue.use(new VueSocketIO({
-    debug: true,
-    connection: 'http://127.0.0.1:9878/ws',
+  debug: true,
+  connection: 'http://39.107.229.211:9800/ws',
 }))
 
 Vue.config.productionTip = false;

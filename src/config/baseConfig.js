@@ -1,5 +1,5 @@
 // api baseurl.
-const SERVER_BASE_URL = "http://127.0.0.1:9878/";
+const SERVER_BASE_URL = "http://39.107.229.211:9800/";
 
 // 客户端类型
 const CLIENT_TYPE = 1000;

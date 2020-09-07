@@ -1,6 +1,11 @@
 <template>
   <div>
     <div class="ground">
+      <div class="header">
+        <div class="name">{{user}}</div>
+       <el-avatar class="avatar" :style="'background-color:'+this.color">{{user[0]}}</el-avatar>
+       <el-divider id="divider"></el-divider>
+      </div>
       <div class="content">
         <div class='bigButton' @click="dialogVisible = true"><span>创建房间</span></div>
         <div class='bigButton right' @click="dialogVisible2 = true"><span>加入房间</span></div>
@@ -90,6 +95,8 @@
       }
     },
     created() {
+      this.user = localStorage.getItem('user');
+      this.color = localStorage.getItem('color'); 
       getGames(localStorage.getItem('user'))
         .then(res => {
           this.halfGame = res.data
@@ -123,7 +130,7 @@
     position: relative;
     margin: 0 auto;
     min-width: 400px;
-    top: 50%;
+    top: calc(50% - 160px);
     transform: translateY(-50%);
   }
   .bigButton {
@@ -162,5 +169,36 @@
   }
   .right {
     float: right;
+  }
+  .header {
+    width: 60%;
+    height: 80px;
+    margin: 80px auto 0;
+    min-width: 400px;
+  }
+  .header:after,.header:before{
+    content: "";
+    display: table;
+  }
+  .header :after {
+    clear: both;
+  }
+  .avatar {
+    font-size: 24px;
+    line-height: 30px;
+    margin: 5px;
+    float: right;
+    width: 30px;
+    height: 30px;
+  }
+  .name {
+    height: 40px;
+    line-height: 40px;
+    color:#409EFF;
+    float: right;
+  }
+  #divider {
+    background-color: #002451;
+    margin: 40px auto;
   }
 </style>

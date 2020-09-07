@@ -128,7 +128,6 @@
       },
       reconnect: function () {
         console.log('重新连接')
-        this.$socket.emit('connect')
       },
       server_response: function (data) {
       },

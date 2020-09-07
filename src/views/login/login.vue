@@ -71,9 +71,11 @@
             .then(res => {
               if(res.flag === 'success'){
                 localStorage.setItem('user',this.loginData.userName)
+                localStorage.setItem('color',res.color)
                 let r = new Authentication(res);
                 r.saveToken();
                 this.$messageBox.showSuccessMessage(this, r.information);
+                this.$socket.emit('my_name', this.loginData.userName);//TODO: 使用token
                 if(this.$route.query.type == 'force')
                   this.$router.go(-1);
                 else
