@@ -11,7 +11,7 @@
         <div class='bigButton right' @click="dialogVisible2 = true"><span>加入房间</span></div>
       </div>
     </div>
-    <el-dialog title="创建房间" :visible.sync="dialogVisible">
+    <el-dialog title="开始游戏" :visible.sync="dialogVisible">
       <div class='diaContent'>
         <el-switch
           style="display: block"
@@ -23,15 +23,24 @@
           :disabled="isEmpty">
         </el-switch>
         <el-input v-if="value===false" id="select" v-model="title" placeholder="输入游戏标题"></el-input>
+				<el-input v-if="value===false" 
+					id="notice" 
+					v-model="notice" 
+					type="textarea"
+					:rows="3"
+					placeholder="输入游戏公告"
+					resize=none
+					maxlength="500"
+					show-word-limit></el-input>
         <el-select v-if="value===true" id="select" v-model="room" placeholder="已有游戏">
           <el-tooltip class="item" effect="dark" v-for="game in halfGame" :key="game[0]" :content="game[2]" placement="right-start">
             <el-option :label="game[1]" :value="game[0]"></el-option>
           </el-tooltip>
         </el-select>
-        <el-button class="create" @click="createRoom()">创建</el-button>
+        <el-button class="create" @click="beginGame()">启动</el-button>
       </div>
     </el-dialog>
-    <el-dialog title="加入房间" :visible.sync="dialogVisible2">
+    <el-dialog title="加入游戏" :visible.sync="dialogVisible2">
       <div class='diaContent'>
         <el-input id="select" v-model="roomId" placeholder="输入房间号"></el-input>
         <el-button class="create" @click="joinRoom()">加入</el-button>
@@ -42,6 +51,7 @@
 
 <script>
   import {roomCreate} from "../network/room";
+	import {createGame} from "../network/game";
   import {getGames} from "../network/game";
   export default {
     name: "ground",
@@ -55,6 +65,7 @@
         halfGame: [],
         room: '',
         title: '',
+				notice: '',
         roomId: '',
         isEmpty: true,
       };
@@ -63,7 +74,7 @@
       handleSelect(key, keyPath) {
         console.log(key, keyPath);
       },
-      createRoom() {
+      beginGame() {
         if(!this.value && this.title.length < 1) {
           this.$messageBox.showErrorMessage(this, '游戏名太短');
           return 0 
@@ -72,7 +83,21 @@
           this.$messageBox.showErrorMessage(this, '未选择游戏');
           return 0 
         }
-        roomCreate(this.value, this.room, this.title, localStorage.getItem('user'))
+				if(!this.value) {
+					createGame(this.title, this.notice, this.user)
+						.then(res => {
+						  if(res.flag === 'success'){
+						    this.$messageBox.showSuccessMessage(this, res['information']);
+						    this.gotoGame(res['id']);
+						  } else {
+						    this.$messageBox.showErrorMessage(this, res['information']);
+						  }
+						})
+						.catch(res => {
+						  this.$messageBox.showErrorMessage(this, '网络故障');
+						})
+				}
+        roomCreate(this.value, this.room, this.title, this.user)
           .then(res => {
             if(res.flag === 'success'){
               this.$messageBox.showSuccessMessage(this, res['information']);

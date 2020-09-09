@@ -51,7 +51,7 @@
     methods: {
       checkLogin() {
         if (window.localStorage.getItem('token') != null) {
-          // this.$router.replace('/manage');
+          this.$router.replace('/ground');
         }else{
           this.checkCondition();
         }

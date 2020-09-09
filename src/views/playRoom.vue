@@ -71,16 +71,6 @@
             <el-button style="float: right;margin-right: 10px;" @click="updateCharacter">提交</el-button>
           </div>
         </div>
-        <div class="myCard" style="height: 182px;margin-top: 1px;" v-if="isKp">
-          <div class="smallHeader">
-            <span>骰娘</span>
-          </div>
-          <div style="height:460px;text-align: center;">
-            <el-input v-model="shai" style="width: 90%"></el-input>
-            
-            <el-button style="float: right;margin-right: 10px;">发送</el-button>
-          </div>
-        </div>
         <div class="myCard" style="height: 141px;margin-top: 1px;" v-if="isKp">
           <div class="smallHeader">
             <span>流程控制</span>
