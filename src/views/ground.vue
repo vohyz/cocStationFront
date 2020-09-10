@@ -97,19 +97,9 @@
 						  this.$messageBox.showErrorMessage(this, '网络故障');
 						})
 				}
-        roomCreate(this.value, this.room, this.title, this.user)
-          .then(res => {
-            if(res.flag === 'success'){
-              this.$messageBox.showSuccessMessage(this, res['information']);
-              localStorage.setItem('kpRoom', res['id'])
-              this.gotoRoom(res['id']);
-            } else {
-              this.$messageBox.showErrorMessage(this, res['information']);
-            }
-          })
-          .catch(res => {
-            this.$messageBox.showErrorMessage(this, '网络故障');
-          })
+      },
+      gotoGame(gameId) {
+        this.$router.push({path: `/game/${gameId}`});
       },
       joinRoom() {
         let roomId = this.roomId;

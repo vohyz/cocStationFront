@@ -6,6 +6,7 @@ import {Authentication} from "../models/response_model";
 const Login = () => import('../views/login/login');
 const Ground = () => import('../views/ground');
 const playRoom = () => import('../views/playRoom');
+const gamePage = () => import('../views/gamePage');
 
 Vue.use(VueRouter);
 
@@ -30,6 +31,14 @@ const routes = [
     meta: {
       requireAuth: true,
       title: '大厅',
+    }
+  },
+  {
+    path: '/game/:gameId',
+    component: gamePage,
+    meta: {
+      requireAuth: true,
+      title: '游戏房间',
     }
   },
   {

@@ -3,7 +3,7 @@
 		<div class="content">
 			<el-row class="header">
 			  <h3>
-				游戏名: <span style="color:#409EFF">{{game.name}}</span>
+				游戏名: <span style="color:#409EFF">{{1}}</span>
 			  </h3>
 			  <h3>
 				<span class="copy-btn" v-clipboard:copy="url" v-clipboard:success="onCopy" v-clipboard:error="onError">点击这里复制链接</span>
@@ -89,6 +89,205 @@
 </template>
 
 <script>
+  import {getGame, endGame} from "../network/game";
+  export default {
+    name: "gamePage",
+    data() {
+      return {
+        game: '',
+        message: '',
+        items: [],
+        user: '',
+        board: [],
+        title: '',
+        players: [],
+        shai: '',
+        hasC: false,
+        color: '',
+        cName: '',
+        roomId: '',
+        url: '',
+        kp: '',
+        isKp: '',
+      };
+    },
+    sockets: {
+      connect: function () {
+        this.$socket.emit('my_name', this.user)
+      },
+      disconnect: function () {
+        console.log('断开连接')
+      },
+      reconnect: function () {
+        console.log('重新连接')
+      },
+      server_response: function (data) {
+      },
+      join_room: function (data) {
+        console.log(data)
+        console.log(data.length)
+        this.players = []
+        let i = 0
+        let res = []
+        for (; i < data.length; i++) {
+          let ava = '';
+          let name = '';
+          if(data[i].cname.length > 0) {
+            ava = data[i].cname[0]
+            name = data[i].cname+'('+data[i].name+')'
+          } else {
+            ava = data[i].name[0]
+            name = data[i].cname+'('+data[i].name+')'
+          }
+          let temp = {
+            ava: ava,
+            name: name, 
+            color: data[i].color,
+          }
+          this.players.push(temp)
+        }
+      },
+      send_message: function (data) {
+        // console.log('接收数据', data)
+        if(data.name === this.user){
+          data = this.setClass(data, 'right')
+        } else {
+          data = this.setClass(data, 'left')
+        }
+        if(data.cname.length > 0)
+          data.name = data.cname
+        this.items.push(data)
+      },
+      server_history: function (d) {
+        let data = d
+        let i = 0
+        for (; i < data.length; i++) {
+          if(data[i][3].length > 0){
+            data[i][2] = data[i][3]
+          }
+          let temp = {
+            'id': data[i][0],
+            'name': data[i][2], 
+            'color': data[i][4],
+            'content': data[i][1]
+          }
+          let res = {}
+          if (data[i][2] === this.user) {
+            res = this.setClass(temp, 'right')
+          } else {
+            res = this.setClass(temp, 'left')
+          }
+          this.items.push(res)
+        }
+      },
+      my_info: function (d) {
+        this.color = d['color']
+        this.cName = d['cname']
+      },
+      close_room: function (d) {
+        this.$router.replace('/ground');
+      },
+    },
+    methods: {
+      joinRoom() {
+        this.$socket.emit('join_room', this.$route.params.roomId + ' ' + localStorage.getItem('user'))
+      },
+      getAllPlayers() {
+        this.$socket.emit('get_player', this.$route.params.roomId)
+      },
+      send () {
+        let data = this.message
+        if(data.length === 0) {
+          this.$messageBox.showErrorMessage(this, '发送信息不能为空');
+          return 0;
+        }
+        this.$socket.emit('message', data)
+        this.message = ''
+      },
+      scrollDown () {
+        this.$refs['myScrollbar'].wrap.scrollTop = this.$refs['myScrollbar'].wrap.scrollHeight;
+      },
+      setClass(data, type) {
+        data.aClass = 'avatar'+' '+type
+        data.tClass = 'myTag'+' '+type
+        let a = ''
+        if(type === 'right') {
+          a = 'left'
+        } else {
+          a = 'right'
+        }
+        data.dClass = 'anti'+' '+a
+        return data
+      },
+      updateCharacter () {
+        let l = +this.color;
+        if(this.cName.length > 0 && this.color.length > 0)
+          this.$socket.emit('change_character', this.cName+'<divider>'+this.color)
+        else
+          this.$messageBox.showErrorMessage(this, '信息不能为空');
+      },
+      onCopy (e) {
+        console.log(this.url)
+        this.$messageBox.showSuccessMessage(this, '已复制到剪贴板');
+      },
+      onError (e) {
+        console.log('error')
+        this.$messageBox.showErrorMessage(this, 'adada');
+      },
+      gameEnd() {
+        endGame(this.roomId)
+          .then(res => {
+            if(res.flag==='success'){
+              this.$messageBox.showSuccessMessage(this, res['information']);
+            } else {
+              this.$messageBox.showErrorMessage(this, res['information']);
+            }
+          })
+          .catch(res => {
+            this.$messageBox.showErrorMessage(this, res['information']);
+          })
+      }
+    },
+    mounted() {
+      this.gameId = this.$route.params.gameId;
+      this.url = location.href;
+      this.user = localStorage.getItem('user');
+      var _self = this;
+      document.onkeydown = function(e){
+          var keyCode = e.keyCode || e.which || e.charCode;
+          var altKey = e.altKey ;
+          if(altKey && keyCode == 13) {
+              _self.send();
+          }
+      }
+      getGame(this.$route.params.roomId)
+        .then(res => {
+          if(res.flag==='success'){
+            this.game = res.data
+            this.title = res.data[1];
+            this.kp = res.data[5];
+            if(this.kp === localStorage.getItem('user')) {
+              this.isKp = true;
+              console.log('isKp')
+            }
+            this.joinRoom();
+          } else {
+            console.log('shabicuowu')
+            this.$messageBox.showErrorMessage(this, res['information']);
+            this.$router.go(-1)
+          }
+        })
+        .catch(res => {
+          this.$messageBox.showErrorMessage(this, res['information']);
+        })
+    },
+    beforeDestroy() {
+      this.$socket.emit('leave_room', this.$route.params.roomId)
+    },
+    updated: function () {
+      this.scrollDown()
+    },
+  }
 </script>
 
 <style scoped>
