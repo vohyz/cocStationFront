@@ -52,7 +52,7 @@
 <script>
   import {roomCreate} from "../network/room";
 	import {createGame} from "../network/game";
-  import {getGames} from "../network/game";
+  import {getGames} from "../network/user";
   export default {
     name: "ground",
     data() {

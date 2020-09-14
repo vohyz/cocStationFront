@@ -23,6 +23,16 @@ export function userRegister(userName, password) {
   })
 }
 
+export function getGames(name) {
+  return request({
+    method: 'post',
+    url: '/user/getGames',
+    data: {
+      name: name
+    }
+  })
+}
+
 export function checkToken() {
   return request({
     method: 'get',

@@ -14,16 +14,6 @@ export function createGame(title, notice, name) {
   })
 }
 
-export function getGames(name) {
-  return request({
-    method: 'post',
-    url: '/game/get',
-    data: {
-      name: name
-    }
-  })
-}
-
 export function getGame(id) {
   return request({
     method: 'post',

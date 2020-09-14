@@ -260,7 +260,7 @@
               _self.send();
           }
       }
-      getGame(this.$route.params.roomId)
+      getGame(this.$route.params.gameId)
         .then(res => {
           if(res.flag==='success'){
             this.game = res.data
